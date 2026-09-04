@@ -8,8 +8,20 @@ from urllib.parse import urlparse
 from typing import List, Dict
 
 def extract_urls(text: str) -> List[str]:
-    url_pattern = re.compile(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+[^\s]*')
-    return list(set(url_pattern.findall(text)))
+    # http://, https://, 또는 www. 로 시작하는 도메인 및 경로 추출 정규식
+    url_pattern = re.compile(r'(?:https?://|www\.)[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:/[^\s<>\'\"]*)?')
+    raw_urls = url_pattern.findall(text)
+    
+    processed_urls = []
+    for url in raw_urls:
+        # urlparse 함수가 정상적으로 작동하도록 www. 로 시작하는 경우 http:// 스킴 추가
+        if url.startswith('www.'):
+            url = 'http://' + url
+        # 문장 부호가 꼬리에 붙어 추출된 경우 제거
+        url = url.rstrip('.,?!')
+        processed_urls.append(url)
+        
+    return list(set(processed_urls))
 
 def calculate_entropy(text: str) -> float:
     if not text:
@@ -50,7 +62,6 @@ def extract_url_features(url: str) -> Dict[str, float]:
 
 class LightGBMAnalyzer:
     def __init__(self):
-        # 파인튜닝 전 파이프라인 에러 방지를 위해 임의의 데이터로 모델을 초기 학습시킵니다.
         dummy_features = extract_url_features("http://example.com")
         feature_names = list(dummy_features.keys())
         

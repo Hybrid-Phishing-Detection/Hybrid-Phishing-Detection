@@ -15,7 +15,10 @@ reputation_provider = get_reputation_provider()
 @router.post("/analyze", response_model=AnalyzeResponse)
 async def analyze_email(request: AnalyzeRequest, db: Session = Depends(get_db)):
     email_risk = email_analyzer.analyze(request.subject, request.body)
-    extracted_urls = extract_urls(request.body)
+    
+    # 제목과 본문을 병합하여 URL 추출 대상을 확장합니다.
+    full_text = f"{request.subject} {request.body}"
+    extracted_urls = extract_urls(full_text)
     
     urls_result = []
     url_final_risks = []
