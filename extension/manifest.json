@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Hybrid Phishing Detection",
+  "version": "1.0",
+  "description": "화면 내 이메일 텍스트 및 URL 실시간 피싱 위험도 분석 확장 프로그램",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://localhost:8000/*",
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "css": ["content.css"],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_title": "Phishing Detector"
+  }
+}
